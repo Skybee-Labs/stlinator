@@ -1,44 +1,43 @@
-import wave
-import json
+#!/usr/bin/env python3
 
-from vosk import Model, KaldiRecognizer, SetLogLevel
+import threading
+import sys
+from ffmpeg_audio_extractor import extract_audio
+from read_audio_chunk import read_audio_chunk
 import Word as custom_Word
+from queue import Queue
 
-model_path = "models/vosk-model-en-us-0.21"
-audio_filename = "audio/speech_recognition_systems.wav"
+def main():
+    queue = Queue()
+    chunk_size = 4000
+    sample_rate = 16000
 
-model = Model(model_path)
-wf = wave.open(audio_filename, "rb")
-rec = KaldiRecognizer(model, wf.getframerate())
-rec.SetWords(True)
+    ffmpeg_process = extract_audio(sys.argv[1], sample_rate)
 
-# get the list of JSON dictionaries
-results = []
-# recognize speech using vosk model
-while True:
-    data = wf.readframes(4000)
-    if len(data) == 0:
-        break
-    if rec.AcceptWaveform(data):
-        part_result = json.loads(rec.Result())
-        results.append(part_result)
-part_result = json.loads(rec.FinalResult())
-results.append(part_result)
+    audio_thread = threading.Thread(target=read_audio_chunk, args=(ffmpeg_process, chunk_size, sample_rate, queue))
+    audio_thread.start()
 
-# convert list of JSON dictionaries to list of 'Word' objects
-list_of_Words = []
-for sentence in results:
-    if len(sentence) == 1:
-        # sometimes there are bugs in recognition 
-        # and it returns an empty dictionary
-        # {'text': ''}
-        continue
-    for obj in sentence['result']:
-        w = custom_Word.Word(obj)  # create custom Word object
-        list_of_Words.append(w)  # and add it to list
+    ffmpeg_process.wait()
 
-wf.close()  # close audiofile
+    audio_thread.join()
 
-# output to the screen
-for word in list_of_words:
-    print(word.to_string())
+    list_of_words = []
+    results = queue.get()
+    for sentence in results:
+        if len(sentence) == 1:
+            # sometimes there are bugs in recognition 
+            # and it returns an empty dictionary
+            # {'text': ''}
+            continue
+        for obj in sentence['result']:
+            w = custom_Word.Word(obj)  # create custom Word object
+            list_of_words.append(w)  # and add it to list
+
+
+    for word in list_of_words:
+        print(word.to_string())
+
+
+if __name__ == "__main__":
+    main()
+
