@@ -7,12 +7,12 @@ from read_audio_chunk import read_audio_chunk
 import Word as custom_Word
 from queue import Queue
 
-def main():
+def lambda_handler(event, context):
     queue = Queue()
     chunk_size = 4000
     sample_rate = 16000
 
-    ffmpeg_process = extract_audio(sys.argv[1], sample_rate)
+    ffmpeg_process = extract_audio(event["input_file"], sample_rate)
 
     audio_thread = threading.Thread(target=read_audio_chunk, args=(ffmpeg_process, chunk_size, sample_rate, queue))
     audio_thread.start()
@@ -37,6 +37,15 @@ def main():
     for word in list_of_words:
         print(word.to_string())
 
+    return "success"
+
+def main():
+    event = {
+        "input_file": sys.argv[1]
+    }
+    context = None 
+    response = lambda_handler(event, context)
+    print(response)
 
 if __name__ == "__main__":
     main()
