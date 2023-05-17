@@ -1,12 +1,18 @@
-version: '2'
+version: "3"
+
 services:
-  api:
-    container_name: api 
-    extends:
-      file: docker-compose.shared.yml
-      service: api
+  lambda-dev:
+    container_name: lambda-dev
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "3"
+    mem_limit: 2g
+    mem_reservation: 240m
     build:
+      context: .
+      dockerfile: Dockerfile.dev.amd64
       args:
         - DEBUG=1
     volumes:
-      - .:/vscode-dockerized-setup
+      - .:/workspaces

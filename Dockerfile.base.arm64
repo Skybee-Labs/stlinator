@@ -1,0 +1,11 @@
+FROM --platform=linux/arm64 public.ecr.aws/lambda/python:3.10-arm64
+
+RUN yum update -y
+RUN yum install -y tar xz
+
+RUN curl -o ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-arm64-static.tar.xz
+
+RUN mkdir /ffmpeg
+RUN tar xvvf ffmpeg.tar.xz -C /ffmpeg --strip-components=1
+
+ENV PATH="/ffmpeg:${PATH}"

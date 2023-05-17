@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  base-image:
+    build:
+      dockerfile: Dockerfile.base.arm64
+    image: audio-extractor-lambda-base:latest
+
+  extractor-lambda:
+    build:
+      dockerfile: Dockerfile.arm64
+    image: audio-extractor-lambda:latest
+    depends_on:
+      - base

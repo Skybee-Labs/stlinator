@@ -1,0 +1,12 @@
+FROM --platform=linux/arm64 audio-extractor
+
+RUN pip install --upgrade pip
+RUN pip install pipenv --no-cache-dir
+
+WORKDIR /src
+
+COPY src /src
+
+RUN pipenv install --clear --system
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]

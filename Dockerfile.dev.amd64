@@ -1,21 +1,18 @@
-FROM python:3.11.3-bullseye
+FROM python:3.10-bullseye
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    bash-completion \
-    && ffmpeg \
+    bash-completion ffmpeg \
     && pip install --upgrade pip \
     && pip install pipenv --no-cache-dir \
     && rm -rf /var/lib/apt/lists/*
 
-ENV API_ROOT /vscode-dockerized-setup/src
-RUN mkdir -p $API_ROOT
+ENV WORK_ROOT /workspaces
+RUN mkdir -p $WORK_ROOT
 
-WORKDIR $API_ROOT
+WORKDIR $WORK_ROOT
 
-COPY src/Pipfile src/Pipfile.lock ${API_ROOT}/
-
-
+COPY src/Pipfile src/Pipfile.lock ${WORK_ROOT}/
 
 ARG DEBUG
 
@@ -35,8 +32,8 @@ RUN set -x  \
     fi \
     && useradd -d /home/apiuser -m --gid=${USER_GID:-${USER_UID:-1000}} --uid=${USER_UID:-1000} apiuser
 
-COPY src $API_ROOT/
-RUN chown -R ${USER_UID:-1000}:${USER_GID:-${USER_UID:-1000}} $API_ROOT
+COPY src $WORK_ROOT/
+RUN chown -R ${USER_UID:-1000}:${USER_GID:-${USER_UID:-1000}} $WORK_ROOT
 
 USER apiuser
 RUN mkdir -p /home/apiuser/.vscode-server/data/Machine

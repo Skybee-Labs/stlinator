@@ -19,9 +19,20 @@
 ## Install new python dependencies:
 While the container is up:
 ```bash
-> docker exec -it -u 0 api bash
+> docker exec -it -u 0 lambda-dev bash
 ```
 Then inside the container:
 ```bash
 > pipenv install <library name> --system
 ```
+
+# Building the ARM64 Lambda Image and Container
+Optionally you can run `docker-compose -f docker-compose-arm64.yml up --build -d` which will build the arm64 version of the lambda and spawn a running container.
+
+Manually:
+1. Build the base image:
+    `docker build -t audio-extractor-lambda-base -f Dockerfile.base.arm64 .`
+2. Build the lambda image:
+    `docker build -t audio-extractor-lambda -f Dockerfile.arm64 .`
+3. Spawn a container:
+    `docker run -it --name extractor-lambda audio-extractor-lambda`
