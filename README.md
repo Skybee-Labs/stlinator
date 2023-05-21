@@ -15,6 +15,10 @@
 - Once VS Code is up:
     - Click on the green button at the bottom left corrner,  and choose `Reopen in Container`
     - This will reload VS Code in the container
+- Open a terminal in the new vscode window and it will drop you inside the container
+    - `cd src`
+    - `pipenv install`
+    - `pipenv shell`
 
 ## Install new python dependencies:
 While the container is up:
