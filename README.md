@@ -1,3 +1,10 @@
+# What Do?
+
+Analyze a video and extract the audio into a .stl file for:
+ - analysis
+ - verification
+ - search
+
 # VS Code Dockerized Setup
 
 ## Prerequisites:
